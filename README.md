@@ -5,10 +5,8 @@
 PHP 8.1.0 and laravel 10.48.8
 <br><br>
 
-**Question**
-<b>2. Why your UI and UX implementation and code implementation is the best?</b>
 
-**Answers:**
+**Explanation:**
 <br>
 **1. UI and UX implementation** - Eeasy to use by the user, because i provide all the informations and needs of the user/tourist in one page. 
 and also the page is responsive they can view or access the website using smartphones or any devices (auto fit to any screen size).
