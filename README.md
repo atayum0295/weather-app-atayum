@@ -1,9 +1,17 @@
 # Weather App Exam - Bizmates - Atayum - 2024/04/25
 
 <b>System Requirements:</b>
-
+<br>
 PHP 8.1.0 and laravel 10.48.8
-<br><br>
+<br>
+<br>
+<b>Installation Guide (Easy Steps):</b> <br>
+**1.** Open the command. <br>
+**2.** Go to the directory you want to copy the project. <br>
+**3.** Then type: **git clone https://github.com/atayum0295/weather-app-atayum** <br>
+**4.** Go to project root folder **weather-app-atayum** and type **php artisan serve** <br>
+**5.** The site is now accessible in default location : **http://127.0.0.1:8000/**  <br> 
+<br>
 
 
 **Explanation:**
