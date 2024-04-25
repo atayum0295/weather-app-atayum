@@ -18,12 +18,12 @@ class WeatherData extends BaseController
 
     public function __construct($location = '', $lat = '' ,$lon = '')
     {
-      $this->location = $location;
-      $this->lat = $lat;
-      $this->lon = $lon;
+        $this->location = $location;
+        $this->lat = $lat;
+        $this->lon = $lon;
     }
 
-   public function getWeather($location = "",$lat = "",$lon = "")
+   public function getWeather()
    {
        $currentWeather = $this->getCurrentWeather();
        return $currentWeather;
@@ -32,16 +32,17 @@ class WeatherData extends BaseController
    private function getWeatherData(){
        $data['message'] = "";
 
-       if ($this->lat != '' and $this->lon != '') {
+      $locationValidation = $this->locationValidation();
+      if ($locationValidation['is_empty'] == 0  && $locationValidation['location_type'] == 1 ) { //geo location
           $requestUrl = $this->apiUrl . 'appid='. 
                         $this->apiAppid . '&lat='. 
                         $this->lat .'&lon=' . 
                         $this->lon;
-       }else{
+      }elseif ($locationValidation['is_empty'] == 0  && $locationValidation['location_type'] == 2) {  //place location
           $requestUrl = $this->apiUrl . 'appid='. 
                         $this->apiAppid . '&q=' . 
                         $this->location;
-       }
+      }
        
        $apiRequest = new ApiRequest($requestUrl);
        $jsonResponse = $apiRequest->getApiResponse();
@@ -60,44 +61,45 @@ class WeatherData extends BaseController
        $fiveDayWeather = array();
 
        foreach ($weatherInfo['list'] as $key => $valWeatherInfo) {
-            if (date('H:i:s', strtotime($valWeatherInfo['dt_txt']))  == "00:00:00") {
-               array_push($fiveDayWeather,$valWeatherInfo);
-            }
+         $dtHours = date('H:i:s', strtotime($valWeatherInfo['dt_txt']));
+         if ($dtHours  == "00:00:00") {
+            array_push($fiveDayWeather,$valWeatherInfo);
+         }
        }
 
        return $fiveDayWeather;
    }
 
    private function getCurrentWeather(){
-          $weatherInfo = $this->getWeatherData();
-          $locationInfo = $this->getLocationInfo();
+       $weatherInfo = $this->getWeatherData();
+       $locationInfo = $this->getLocationInfo();
 
-          if ($weatherInfo['cod'] == 200) {
-             $yourCurrentDate = date("Y-m-d H:i:s");
-             $timezone = $locationInfo['country']['timezone'];
-             $longCurrentDate = strtotime($yourCurrentDate);
-             $longCountryDate = $timezone +  $longCurrentDate;
-             $countryDate = date('Y-m-d H:i:s', $longCountryDate);
-             $date_format = date('l - F d, Y', $longCountryDate);
-             $data['date_format'] = $date_format;
-             $data['country_date'] = $countryDate;
-             $data['location_name'] = $locationInfo['country']['name'];
-             $data['location_acronym'] = $locationInfo['country']['country'];
-             $data['location_country'] = $locationInfo['country']['country'];
-             $data["sunrise"] =  date("H:i", $locationInfo['country']['sunrise'] + $locationInfo['country']['timezone']);
-             $data['sunset'] = date("H:i", $locationInfo['country']['sunset'] + $locationInfo['country']['timezone']);
-             $data['coor_lat'] = $locationInfo['country']['coord']['lat'];
-             $data['coor_lon'] = $locationInfo['country']['coord']['lon'];
-             $current = $weatherInfo["list"][0];
-             $data['dt_text_current'] = date("H:i A",$longCountryDate);
-             $data['current'] = $current['main'];
-             $data['weather'] = $current['weather'][0];
-             $data['wind'] = $current['wind'];
-         }else{
-            $data = $weatherInfo;
-         }
+       if ($weatherInfo['cod'] == 200) {
+          $yourCurrentDate = date("Y-m-d H:i:s");
+          $timezone = $locationInfo['country']['timezone'];
+          $longCurrentDate = strtotime($yourCurrentDate);
+          $longCountryDate = $timezone +  $longCurrentDate;
+          $countryDate = date('Y-m-d H:i:s', $longCountryDate);
+          $date_format = date('l - F d, Y', $longCountryDate);
+          $data['date_format'] = $date_format;
+          $data['country_date'] = $countryDate;
+          $data['location_name'] = $locationInfo['country']['name'];
+          $data['location_acronym'] = $locationInfo['country']['country'];
+          $data['location_country'] = $locationInfo['country']['country'];
+          $data["sunrise"] =  date("H:i", $locationInfo['country']['sunrise'] + $locationInfo['country']['timezone']);
+          $data['sunset'] = date("H:i", $locationInfo['country']['sunset'] + $locationInfo['country']['timezone']);
+          $data['coor_lat'] = $locationInfo['country']['coord']['lat'];
+          $data['coor_lon'] = $locationInfo['country']['coord']['lon'];
+          $current = $weatherInfo["list"][0];
+          $data['dt_text_current'] = date("H:i A",$longCountryDate);
+          $data['current'] = $current['main'];
+          $data['weather'] = $current['weather'][0];
+          $data['wind'] = $current['wind'];
+      }else{
+         $data = $weatherInfo;
+      }
 
-          return $data;
+      return $data;
    }
 
 
@@ -113,15 +115,25 @@ class WeatherData extends BaseController
       return $locationInfo;
    }
 
-   private function locationValidate($location = ""){
-      $status['message'] = "";
-      $status['is_error'] = 0;
+   private function locationValidation(){
+     $status['message'] = "";
+     $status['location_type'] = 0;
+     $status['is_empty'] = 1;
 
-      if ($location == "") {
-         $status['message'] = "Please select location.";
-         $status['is_error'] = 1;
+     if ($this->location == "" && $this->lat == "" && $this->lon == "") {
+         $status['message'] = "Location cannot be empty, Please select location.";
+         $status['location_type'] = 0;
+         $status['is_empty'] = 1;
+     }else{
+         if ($this->lat != "" && $this->lon != "")  {
+            $status['location_type'] = 1; // 'geo location'
+            $status['is_empty'] = 0;
+         }elseif($this->location != ""){
+            $status['location_type'] = 2; //'place location'
+            $status['is_empty'] = 0;
+         }
       }
-       
+
       return $status;
    }
 
