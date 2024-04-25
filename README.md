@@ -8,10 +8,10 @@ PHP 8.1.0 and laravel 10.48.8
 
 **Explanation:**
 <br>
-**1. UI and UX implementation** - Eeasy to use by the user, because i provide all the informations and needs of the user/tourist in one page. 
+**1. UI and UX implementation** - Easy to use by the user, because i provide all the informations and needs of the user/tourist in one page. 
 and also the page is responsive they can view or access the website using smartphones or any devices (auto fit to any screen size).
 <br>
-**2. Code Implementation** - Easy to maintain/read by developers and scalable for future features.
+**2. Code Implementation** - Maintainable/readable by the developers and scalable for future features.
 
 <br><br>
 
